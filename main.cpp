@@ -7,28 +7,33 @@ class ListElement{
 
     private:
 
-        T element;
-        ListElement* next_element;
+        T element; //element
+        ListElement* next_element; //pointer to next element
 
     public:
 
+        //constructor
         ListElement(T element){
             this->element = element;
             this->next_element = nullptr;
         }
 
+        //method that sets a pointer to next element
         void set_next_element(ListElement* next_element){
             this->next_element = next_element;
         }
 
+        //method that returns a pointer to next element
         ListElement* get_next_element(){
             return this->next_element;
         }
 
+        //method that returns element
         T get_element(){
             return this->element;
         }
 
+        //method that returns a reference to element
         T& get_reference(){
             return this->element;
         }
@@ -40,26 +45,30 @@ class List{
 
     private:
 
-        ListElement<T>* start;
-        ListElement<T>* end;
-        int size;
+        ListElement<T>* start; //pointer to list start
+        ListElement<T>* end; //pointer to list end
+        int size; //list size
 
     public:
 
+        //constructor
         List(){
             this->start = nullptr;
             this->end = nullptr;
             this->size = 0;
         }
 
+        //destructor
         ~List(){
             this->clear();
         }
 
+        //method that returns list size
         int get_size(){
             return this->size;
         }
 
+        //method that checks if list is empty
         bool is_empty(){
             if(this->size == 0){
                 return true;
@@ -68,6 +77,7 @@ class List{
             }
         }
 
+        //method that adds an element to list end
         void add_back(T element){
             ListElement<T>* new_element = new ListElement<T>(element);
             if(this->is_empty()){
@@ -79,6 +89,7 @@ class List{
             this->size++;
         }
 
+        //method that adds an element to list start
         void add_front(T element){
             ListElement<T>* new_element = new ListElement<T>(element);
             if(this->is_empty()){
@@ -90,6 +101,7 @@ class List{
             this->size++;
         }
 
+        //method that removes an element from list end
         void remove_back(){
             if(this->is_empty()){
                 return;
@@ -111,6 +123,7 @@ class List{
             }
         }
 
+        //method that removes an element from list start
         void remove_front(){
             if(this->is_empty()){
                 return;
@@ -128,6 +141,7 @@ class List{
             }
         }
 
+        //method that returns the element of list start
         T get_front(){
             if(this->is_empty()){
                 throw out_of_range("List is empty");
@@ -136,6 +150,7 @@ class List{
             }
         }
 
+        //method that returns the element of list end
         T get_back(){
             if(this->is_empty()){
                 throw out_of_range("List is empty");
@@ -144,6 +159,7 @@ class List{
             }
         }
 
+        //method that returns an element from list by index 
         T get(int id){
             if(id < 0 || id >= this->get_size() || this->is_empty()){
                 throw out_of_range("Index out of bounds");
@@ -155,6 +171,7 @@ class List{
             return current->get_element();
         }
 
+        //method that returns a reference to an element from list by index
         T& get_reference(int id){
             if(id < 0 || id >= this->get_size() || this->is_empty()){
                 throw out_of_range("Index out of bounds");
@@ -166,6 +183,7 @@ class List{
             return current->get_reference();
         }
 
+        //method that clears list
         void clear(){
             int size = this->get_size();
             if(!this->is_empty()){
@@ -175,6 +193,7 @@ class List{
             }
         }
 
+        //method that prints list
         void print(){
             ListElement<T>* current = this->start;
             while(current != nullptr){
@@ -364,9 +383,9 @@ Graph graph_reader(string filename){
 
 int main(){
 
-Graph graph = graph_reader("3rooms.txt");
+Graph graph = graph_reader("2rooms.txt");
 
-cout << "Graph for 8 rooms: " << endl;
+cout << "Graph for 2 rooms: " << endl;
 graph.print();
 
 cout << endl;
