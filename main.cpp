@@ -659,11 +659,11 @@ class Graph{
 
 
         //method that calculates heuristic (steps to goal vertex) for each vertex
-        Map<int, int> calculate_heuristic_bfs(int start_vertex_id){
+        Map<int, int> calculate_heuristic(int start_vertex_id){
             Map<int, int> heuristic_map;
             heuristic_map.insert(start_vertex_id, 0); //cost from goal -> goal is 0
-            Queue<int> queue;
 
+            Queue<int> queue;
             queue.add(start_vertex_id);
             while (!queue.is_empty()) {
                 int visited = queue.get_front();
@@ -674,7 +674,7 @@ class Graph{
                     int neighbour = this->graph.get_reference(visited).get_neighbours().get(i).get_to();
                     int neighbour_cost = this->graph.get_reference(visited).get_neighbours().get(i).get_cost();
                     int new_cost = cost + neighbour_cost;
-                //if this path to neighbour vertex is shorter than a different one, update the new heuristic for this neighbour vertex
+                //if this path to neighbour vertex is new or shorter than a different one, update the new heuristic for this neighbour vertex
                 if (!heuristic_map.exists(neighbour) || heuristic_map.get_value(neighbour) > new_cost) {
                     heuristic_map.insert(neighbour, new_cost);
                     queue.add(neighbour);
@@ -730,10 +730,10 @@ graph.print_bfs(4);
 cout<< "\n";
 cout<< "\n";
 
-Map<int, int> heuristic = graph.calculate_heuristic_bfs(4);
+Map<int, int> heuristic_values = graph.calculate_heuristic(4);
 for (int i = 0; i < graph.get_size(); i++) {
-    if (heuristic.exists(i)) {
-        cout << "4" << " -> " << i << " is " << heuristic.get_value(i) << " steps " << "\n";
+    if (heuristic_values.exists(i)) {
+        cout << "4" << " -> " << i << " is " << heuristic_values.get_value(i) << " steps " << "\n";
     }
 }
 
