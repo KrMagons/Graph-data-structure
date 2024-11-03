@@ -49,6 +49,60 @@ class List{
         ListElement<T>* end; //pointer to list end
         int size; //list size
 
+        //method that splits list in half and returns a pointer to list middle
+        ListElement<T>* split(ListElement<T>* start){
+            ListElement<T>* fast = start;
+            ListElement<T>* slow = start;
+
+            while (fast->get_next_element() != nullptr && fast->get_next_element()->get_next_element() != nullptr) {
+                fast = fast->get_next_element()->get_next_element();
+                slow = slow->get_next_element();
+            }
+            ListElement<T>* temporary = slow->get_next_element();
+            slow->set_next_element(nullptr);
+            return temporary;
+        }
+
+        //recursive method that merges two sorted lists together
+        ListElement<T>* merge(ListElement<T>* first, ListElement<T>* second){
+            if (first == nullptr) {
+                return second;
+            }
+
+            if (second == nullptr) {
+                return first;
+            }
+
+            ListElement<T>* merged = nullptr;
+
+            if (first->get_element() <= second->get_element()) {
+                merged = first;
+                merged->set_next_element(merge(first->get_next_element(), second));
+            } else {
+                merged = second;
+                merged->set_next_element(merge(first, second->get_next_element()));
+            }
+            return merged;
+        }
+
+        //recursive method that uses split and merge to sort list
+        void merge_sort(ListElement<T>* start){
+            if (this->start == nullptr || this->start->get_next_element() == nullptr) {
+                return;
+            }
+
+            ListElement<T>* second = split(this->start);
+            merge_sort(this->start);
+            merge_sort(second);
+            this->start = merge(this->start, second);
+
+            ListElement<T>* current = this->start;
+            while (current->get_next_element() != nullptr) {
+                current = current->get_next_element();
+            }
+            this->end = current;
+        }
+
     public:
 
         //constructor
@@ -95,9 +149,32 @@ class List{
             if(this->is_empty()){
                 this->end = new_element;
             }else{
-                new_element.set_next_element(this->start);
+                new_element->set_next_element(this->start);
             }
             this->start = new_element;
+            this->size++;
+        }
+
+        //method that sorts an element in list and adds it (list must be sorted already)
+        void add_sorted(T element){
+            if (this->is_empty() || element >= this->end->get_element()) {
+                this->add_back(element);
+                return;
+            }
+
+            if (element <= this->start->get_element()) {
+                this->add_front(element);
+                return;
+            }
+
+            ListElement<T>* new_element = new ListElement<T>(element);
+            ListElement<T>* current = this->start;
+
+            while (current->get_next_element() != nullptr && current->get_next_element()->get_element() < element) {
+                current = current->get_next_element();
+            }
+            new_element->set_next_element(current->get_next_element());
+            current->set_next_element(new_element);
             this->size++;
         }
 
@@ -141,6 +218,32 @@ class List{
             }
         }
 
+        //method that removes an element from list by index
+        void remove(int id){
+            if(id < 0 || id >= this->get_size() || this->is_empty()){
+                throw out_of_range("Index out of bounds");
+            }
+            
+            ListElement<T>* current = this->start;
+
+            if (id == 0) {
+                this->start = current->get_next_element();
+                delete current;
+                this->size--;
+                return;
+            }
+
+            ListElement<T>* previous_element = nullptr;    
+            for (int i = 0; i < id; i++) {
+                previous_element = current;
+                current = current->get_next_element();
+            }
+
+            previous_element->set_next_element(current->get_next_element());
+            delete current;
+            this->size--;
+        }
+
         //method that returns the element of list start
         T get_front(){
             if(this->is_empty()){
@@ -181,6 +284,11 @@ class List{
                 current = current->get_next_element();
             }
             return current->get_reference();
+        }
+
+        //method that sorts list
+        void sort(){
+            this->merge_sort(this->start);
         }
 
         //method that clears list
@@ -241,12 +349,200 @@ class Queue{
 };
 
 
+template <typename T>
+class PriorityQueue{
+
+    private:
+
+        List<T> priority_queue;
+
+    public:
+
+        PriorityQueue(){
+            this->priority_queue.sort();
+        }
+
+        int get_size(){
+            return this->priority_queue.get_size();
+        }
+
+        bool is_empty(){
+            return this->priority_queue.is_empty();
+        }
+
+        void push(T element){
+            this->priority_queue.add_sorted(element);
+        }
+
+        T pop(){
+            if (this->is_empty()){
+                throw out_of_range("Priority queue is empty");
+            }
+
+            T element = this->priority_queue.get_front();
+            this->priority_queue.remove_front();
+            return element;
+        }
+
+        T get_element(int id){
+            return this->priority_queue.get(id);
+        }
+
+        void print(){
+            while (!this->is_empty()) {
+                cout << this->pop() << " ";
+            }
+        }
+};
+
+
+template <typename T1, typename T2>
+class Pair{
+
+    private:
+
+        T1 first;
+        T2 second;
+
+    public:
+
+        Pair(){}
+
+        Pair(T1 first, T2 second){
+            this->first = first;
+            this->second = second;
+        }
+
+        T1 get_first(){
+            return this->first;
+        }
+
+        T2 get_second(){
+            return this->second;
+        }
+
+        void set_first(T1 first){
+            this->first = first;
+        }
+
+        void set_second(T2 second){
+            this->second = second;
+        }
+
+        void print(){
+            cout << this->get_first() << " " << this->get_second();
+        }
+
+};
+
+
+template<typename K, typename V>
+class Map{
+
+    private:
+
+        List<Pair<K, V>> map;
+
+    public:
+
+        Map(){}
+
+        int get_size(){
+            return this->map.get_size();
+        }
+
+        bool is_empty(){
+            return this->map.is_empty();
+        }
+
+        void insert(K key, V value){
+            if (this->exists(key)) {
+                throw runtime_error("Key already exists");
+            }
+            
+            Pair<K, V> pair(key, value);
+            map.add_back(pair);
+        }
+
+        void remove(K key){
+            if (!this->exists(key)) {
+                throw runtime_error("Key not found");
+            }
+
+            for (int i = 0; i < this->get_size(); i++) {
+                if (this->map.get(i).get_first() == key) {
+                    this->map.remove(i);
+                    break;
+                }
+            }
+        }
+
+        void clear(){
+            this->map.clear();
+        }
+
+        bool exists(K key){
+            if (this->map.is_empty()) {
+                return false;
+            }
+
+            for (int i = 0; i < this->get_size(); i++){
+                if (this->map.get(i).get_first() == key) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void update_value(K key, V value){
+            if (this->is_empty()){
+                throw runtime_error("Map is empty");
+            }
+
+            for (int i = 0; i < this->get_size(); i++){
+                if (this->map.get(i).get_first() == key) {
+                    this->map.get(i).get_second() = value;
+                }
+            }
+            throw runtime_error("Key not found");
+        }
+
+        V get_value(K key){
+            if (this->is_empty()) {
+                throw runtime_error("Map is empty");
+            }
+
+            for (int i = 0; i < this->get_size(); i++) {
+                if (this->map.get(i).get_first() == key) {
+                    return this->map.get(i).get_second();
+                }
+            }
+            throw runtime_error("No value found for this key");
+        }
+
+        K get_key(V value){
+            if (this->is_empty()) {
+                throw runtime_error("Map is empty");
+            }
+
+            for (int i = 0; i < this->get_size(); i++) {
+                if (this->map.get(i).get_second() == value) {
+                    return this->map.get(i).get_first();
+                }
+            }
+            throw runtime_error("No key found for this value");
+        }
+
+};
+
+
 class Edge{
 
     private:
 
         int from;
         int to;
+        int cost; //always 1
 
     public:
 
@@ -255,6 +551,7 @@ class Edge{
         Edge(int from, int to){
             this->from = from;
             this->to = to;
+            this->cost = 1;
         }
 
         int get_from(){
@@ -263,6 +560,10 @@ class Edge{
 
         int get_to(){
             return this->to;
+        }
+
+        int get_cost(){
+            return this->cost;
         }
 };
 
@@ -316,6 +617,10 @@ class Graph{
             this->graph.get_reference(from).add_neighbour(edge);
         }
 
+        int get_size(){
+            return this->graph.get_size();
+        }
+
         void print(){
             if(this->graph.is_empty()){
                 return;
@@ -337,19 +642,47 @@ class Graph{
 
             queue.add(start_vertex_id);
             visited_vertices[start_vertex_id] = true;
-            while(!queue.is_empty()){
+            while (!queue.is_empty()) {
                 int visited = queue.get_front();
                 queue.remove();
                 cout << visited << " ";
-                for(int i = 0; i < this->graph.get_reference(visited).get_neighbours().get_size(); i++){
+                for (int i = 0; i < this->graph.get_reference(visited).get_neighbours().get_size(); i++) {
                     int neighbour = this->graph.get_reference(visited).get_neighbours().get(i).get_to();
-                    if(!visited_vertices[neighbour]){
+                    if (!visited_vertices[neighbour]) {
                         queue.add(neighbour);
                         visited_vertices[neighbour] = true;
                     }
                 }
                 
             }
+        }
+
+
+        //method that calculates heuristic (steps to goal vertex) for each vertex
+        Map<int, int> calculate_heuristic_bfs(int start_vertex_id){
+            Map<int, int> heuristic_map;
+            heuristic_map.insert(start_vertex_id, 0); //cost from goal -> goal is 0
+            Queue<int> queue;
+
+            queue.add(start_vertex_id);
+            while (!queue.is_empty()) {
+                int visited = queue.get_front();
+                queue.remove();
+                int cost = heuristic_map.get_value(visited);
+                //get neighbours for current vertex
+                for (int i = 0; i < this->graph.get_reference(visited).get_neighbours().get_size(); i++) {
+                    int neighbour = this->graph.get_reference(visited).get_neighbours().get(i).get_to();
+                    int neighbour_cost = this->graph.get_reference(visited).get_neighbours().get(i).get_cost();
+                    int new_cost = cost + neighbour_cost;
+                //if this path to neighbour vertex is shorter than a different one, update the new heuristic for this neighbour vertex
+                if (!heuristic_map.exists(neighbour) || heuristic_map.get_value(neighbour) > new_cost) {
+                    heuristic_map.insert(neighbour, new_cost);
+                    queue.add(neighbour);
+                }
+                }
+
+            }
+            return heuristic_map;
         }
 };
 
@@ -379,18 +712,29 @@ Graph graph_reader(string filename){
     }
 
     return graph;
+
+
 }
 
 int main(){
 
-Graph graph = graph_reader("2rooms.txt");
-
-cout << "Graph for 2 rooms: " << endl;
+Graph graph = graph_reader("3rooms.txt");
+cout<< "Graph with 3 rooms: " << "\n";
 graph.print();
 
-cout << endl;
+cout<< "\n";
 
-cout << "BFS from state 0: " << endl;
-graph.print_bfs(0);
+cout << "BFS Graph from state 4: " << "\n";
+graph.print_bfs(4);
+
+cout<< "\n";
+cout<< "\n";
+
+Map<int, int> heuristic = graph.calculate_heuristic_bfs(4);
+for (int i = 0; i < graph.get_size(); i++) {
+    if (heuristic.exists(i)) {
+        cout << "4" << " -> " << i << " is " << heuristic.get_value(i) << " steps " << "\n";
+    }
+}
 
 }
