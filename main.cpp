@@ -661,7 +661,7 @@ class Graph{
         //method that calculates heuristic (steps to goal vertex) for each vertex
         Map<int, int> calculate_heuristic(int start_vertex_id){
             Map<int, int> heuristic_map;
-            heuristic_map.insert(start_vertex_id, 0); //cost from goal -> goal is 0
+            heuristic_map.insert(start_vertex_id, 0); //cost from start -> start is 0
 
             Queue<int> queue;
             queue.add(start_vertex_id);
