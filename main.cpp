@@ -677,10 +677,59 @@ class Graph{
                 }
             }
         }
+
+        void print_shortest_path(int start, int goal){
+	    int vertex_count = this->graph.get_size();
+	    bool visited_vertices[vertex_count] = {false};
+	    visited_vertices[start] = true;
+
+	    Map<int, int> path;
+	    path.insert(start, -1);
+
+
+	    Queue queue;
+	    queue.add(start);
+	    while (!queue.is_empty()) {
+		    int visited = queue.get_front();
+		    queue.remove();
+
+		    if (visited == goal) {
+                List<int> path_list;
+                int vertex = goal;
+			    while (vertex != -1) {
+                    path_list.add_front(vertex);
+				    vertex = path.get_value(vertex);
+			    }
+            cout << "From start " << start << " to goal " << goal << " is " << path_list.get_size() - 1 << " steps: " << endl;
+            for (int i = 0; i < path_list.get_size(); i++) {
+                cout << path_list.get(i);
+                if (i < path_list.get_size() - 1) {
+                    cout << " -> ";
+                }
+            }
+            return;
+		    }
+
+		    List<Edge> neighbours = this->graph.get_reference(visited).get_neighbours();
+		    for (int i = 0; i < neighbours.get_size(); i++)	{
+			    int neighbour = neighbours.get(i).get_to();
+			    if (!visited_vertices[neighbour]) {
+				    visited_vertices[neighbour] = true;
+				    queue.add(neighbour);
+				    path.insert(neighbour, visited);
+			    }
+		    }
+	    }
+    }
+
+
 };
 
 int main(){
 
-cout << "Hello world!";
+Graph graph;
+graph.read_graph("3rooms.txt");
+graph.print();
+graph.print_shortest_path(12, 21);
 
 };
