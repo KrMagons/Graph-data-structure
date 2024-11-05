@@ -312,12 +312,11 @@ class List{
 };
 
 
-template <typename T>
 class Queue{
 
     private:
 
-        List<T> queue;
+        List<int> queue;
 
     public:
 
@@ -335,11 +334,11 @@ class Queue{
             }
         }
 
-        T get_front(){
+        int get_front(){
             return this->queue.get_front();
         }
 
-        void add(T element){
+        void add(int element){
             this->queue.add_back(element);
         }
 
@@ -349,12 +348,11 @@ class Queue{
 };
 
 
-template <typename T>
 class PriorityQueue{
 
     private:
 
-        List<T> priority_queue;
+        List<int> priority_queue;
 
     public:
 
@@ -370,21 +368,21 @@ class PriorityQueue{
             return this->priority_queue.is_empty();
         }
 
-        void push(T element){
+        void push(int element){
             this->priority_queue.add_sorted(element);
         }
 
-        T pop(){
+        int pop(){
             if (this->is_empty()){
                 throw out_of_range("Priority queue is empty");
             }
 
-            T element = this->priority_queue.get_front();
+            int element = this->priority_queue.get_front();
             this->priority_queue.remove_front();
             return element;
         }
 
-        T get_element(int id){
+        int get_element(int id){
             return this->priority_queue.get(id);
         }
 
@@ -621,6 +619,30 @@ class Graph{
             return this->graph.get_size();
         }
 
+        void read_graph(string filename){
+            fstream file;
+            int vertex_count, edge_count;
+            int from, to;
+
+            file.open(filename);
+            if (!file.is_open())  {
+                throw runtime_error("Error opening file");
+            }
+
+            file >> vertex_count >> edge_count;
+
+            for (int i = 0; i < vertex_count; i++) {
+                this->add_vertex(i);
+            }
+
+            for (int i = 0; i < edge_count; i++) {
+                file >> from >> to;
+                this->add_edge(from, to);
+            }
+
+            file.close();
+        }
+
         void print(){
             if(this->graph.is_empty()){
                 return;
@@ -638,7 +660,7 @@ class Graph{
         void print_bfs(int start_vertex_id){
             int vertex_count = this->graph.get_size();
             bool visited_vertices[vertex_count] = {false};
-            Queue<int> queue;
+            Queue queue;
 
             queue.add(start_vertex_id);
             visited_vertices[start_vertex_id] = true;
@@ -653,88 +675,12 @@ class Graph{
                         visited_vertices[neighbour] = true;
                     }
                 }
-                
             }
-        }
-
-
-        //method that calculates heuristic (steps to goal vertex) for each vertex
-        Map<int, int> calculate_heuristic(int start_vertex_id){
-            Map<int, int> heuristic_map;
-            heuristic_map.insert(start_vertex_id, 0); //cost from start -> start is 0
-
-            Queue<int> queue;
-            queue.add(start_vertex_id);
-            while (!queue.is_empty()) {
-                int visited = queue.get_front();
-                queue.remove();
-                int cost = heuristic_map.get_value(visited);
-                //get neighbours for current vertex
-                for (int i = 0; i < this->graph.get_reference(visited).get_neighbours().get_size(); i++) {
-                    int neighbour = this->graph.get_reference(visited).get_neighbours().get(i).get_to();
-                    int neighbour_cost = this->graph.get_reference(visited).get_neighbours().get(i).get_cost();
-                    int new_cost = cost + neighbour_cost;
-                //if this path to neighbour vertex is new or shorter than a different one, update the new heuristic for this neighbour vertex
-                if (!heuristic_map.exists(neighbour) || heuristic_map.get_value(neighbour) > new_cost) {
-                    heuristic_map.insert(neighbour, new_cost);
-                    queue.add(neighbour);
-                }
-                }
-
-            }
-            return heuristic_map;
         }
 };
 
-
-Graph graph_reader(string filename){
-
-    Graph graph;
-    fstream file;
-    int vertex_count, edge_count;
-    int from, to;
-
-    file.open(filename);
-
-    if(!file.is_open()){
-        throw runtime_error("Error opening file");
-    }
-
-    file >> vertex_count >> edge_count;
-
-    for(int i = 0; i < vertex_count; i++){
-        graph.add_vertex(i);
-    }
-
-    for(int i = 0; i < edge_count; i++){
-        file >> from >> to;
-        graph.add_edge(from, to);
-    }
-
-    return graph;
-
-
-}
-
 int main(){
 
-Graph graph = graph_reader("3rooms.txt");
-cout<< "Graph with 3 rooms: " << "\n";
-graph.print();
+cout << "Hello world!";
 
-cout<< "\n";
-
-cout << "BFS Graph from state 4: " << "\n";
-graph.print_bfs(4);
-
-cout<< "\n";
-cout<< "\n";
-
-Map<int, int> heuristic_values = graph.calculate_heuristic(4);
-for (int i = 0; i < graph.get_size(); i++) {
-    if (heuristic_values.exists(i)) {
-        cout << "4" << " -> " << i << " is " << heuristic_values.get_value(i) << " steps " << "\n";
-    }
-}
-
-}
+};
